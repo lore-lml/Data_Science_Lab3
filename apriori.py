@@ -1,3 +1,5 @@
+number_of_transaction = 0
+all_possible_item = {}
 
 def combinations(values, combos, current_combination, K, level=0, ind_previous_index=-1):
     if level >= K:
@@ -15,7 +17,7 @@ def combinations(values, combos, current_combination, K, level=0, ind_previous_i
 
 
 def filter_itemset(itemset, minsup):
-    return dict(filter(lambda x: x[1] > minsup, itemset.items()))
+    return dict(filter(lambda x: x[1]/number_of_transaction > minsup, itemset.items()))
 
 
 def get_frequency(combo, transactions):
@@ -37,19 +39,21 @@ def get_freq_itemset(transactions, combos, minsup):
 
 
 def apriori(transactions, minsup):
+    global number_of_transaction, all_possible_item
+    number_of_transaction = len(transactions)
     freq_itemset = {}
 
     for t in transactions:
         for item in t:
-            freq_itemset[item] = freq_itemset.get(item, 0) + 1
+            freq_itemset[item.strip()] = freq_itemset.get(item.strip(), 0) + 1
 
     # Frequent Itemset of lenght 1
     freq_itemset = filter_itemset(freq_itemset, minsup)
-    distinct_values = list(freq_itemset.keys())
+    all_possible_item = {item: i for i, item in enumerate(sorted(list(freq_itemset.keys())))}
     K = len(freq_itemset)
 
     for i in range(2, K+1):
-        combos = combinations(distinct_values, [], [], i)
+        combos = combinations(all_possible_item, [], [], i)
         freq_itemset.update(get_freq_itemset(transactions, combos, minsup))
 
     return freq_itemset
@@ -67,5 +71,5 @@ if __name__ == '__main__':
                ['a', 'b', 'd'],
                ['b', 'c', 'e']]
 
-    for k, v in apriori(dataset, 1).items():
+    for k, v in apriori(dataset, 0.1).items():
         print(f"{k}: {v}")
