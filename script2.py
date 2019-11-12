@@ -1,5 +1,5 @@
 import json
-from apriori import apriori
+from my_apriori import apriori
 
 
 def get_json(path):
@@ -14,4 +14,6 @@ if __name__ == '__main__':
     transactions = list(map(lambda t: t['annotations'], dataset))
     #print(transactions[:10])
 
-    print(apriori(transactions, 0.02))
+    freq = apriori(transactions, 0.02)
+    print(sum(list(map(lambda x: len(x), freq))))
+    print(freq)
